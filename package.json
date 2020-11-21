@@ -1,0 +1,55 @@
+{
+  "name": "tmpfs",
+  "version": "0.1.1",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "bs58": "^4.0.1",
+    "copy-to-clipboard": "^3.3.1",
+    "crypto-js": "^4.0.0",
+    "date-and-time": "^0.14.1",
+    "i18next": "^19.8.4",
+    "i18next-browser-languagedetector": "^6.0.1",
+    "int64-buffer": "^0.99.1007",
+    "js-base64": "^3.6.0",
+    "pretty-bytes": "^5.4.1",
+    "qrcode.react": "^1.0.0",
+    "react": "^16.14.0",
+    "react-beforeunload": "^2.4.0",
+    "react-dom": "^16.14.0",
+    "react-i18next": "^11.7.3",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "^3.4.4",
+    "streamsaver": "^2.0.5",
+    "uuid": "^8.3.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "buildGzip": "find ./build -type f -name '*.css' -o -name '*.js' -exec gzip -k '{}' \\;",
+    "buildDelServiceWorker": "cd ./build && rm -f precache-manifest.* && rm -f static/js/runtime-main.* && rm -f asset-manifest.json && rm -f service-worker.js",
+    "buildChecksums": "cd ./build && find . -type f -exec sha256sum {} \\; > ./checksums.txt",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^4.5.0",
+    "webpack-subresource-integrity": "^1.5.2"
+  }
+}

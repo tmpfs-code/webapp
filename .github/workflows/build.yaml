@@ -1,0 +1,41 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: get_version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/v/}
+
+      - uses: actions/checkout@v2
+        name: checkout
+        with:
+          fetch-depth: 1
+
+      - name: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: "v${{ steps.get_version.outputs.VERSION }}"
+          draft: false
+          prerelease: false
+      
+      # see https://github.com/actions/upload-release-asset/issues/28#
+      - name: build_and_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NAME: "v${{ steps.get_version.outputs.VERSION }}"
+        run: |
+          rm -rf artifacts
+          docker build -t webapp .
+          docker run -v $(pwd)/artifacts:/artifacts --entrypoint=/bin/sh webapp -c 'cp -r /build/* /artifacts/'
+          hub release edit $(find artifacts/checksums.txt -type f -printf "-a %p ") -m "" "$RELEASE_NAME"
