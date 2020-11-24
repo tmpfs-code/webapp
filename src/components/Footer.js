@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import { CONTACT_EMAIL, GITHUB_LINK, SERVER_NAME } from "../constants";
+import { CONTACT_EMAIL, getGitHubLink, SERVER_NAME, GIT_COMMIT_HASH } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -75,20 +75,30 @@ function FooterLink(props) {
   </span>
 }
 
+function prettyPrintCommitHashOrTag(str) {
+  if (!str) {
+    return "?";
+  }
+  if (str.length >= 40) {
+    return str.substr(0, 7);
+  }
+  return str;
+}
+
 function Footer() {
   const history = useHistory();
   const classes = useStyles();
   const { t } = useTranslation();
   const [ contactDialogOpen, setContactDialogOpen ] = React.useState(false);
 
-  return <Box className={classes.root}>
+  return <footer className={classes.root}>
     <ContactDialog
       open={contactDialogOpen}
       onClose={() => setContactDialogOpen(false)} 
     />
 
-    <FooterLink onClick={() => window.open(GITHUB_LINK, '_blank')} highlight>
-      GitHub
+    <FooterLink onClick={() => window.open(getGitHubLink(GIT_COMMIT_HASH), '_blank')} highlight>
+      {prettyPrintCommitHashOrTag(GIT_COMMIT_HASH)} (GitHub)
     </FooterLink>
 
     <FooterLink onClick={() => history.push("/pages/privacy")}>
@@ -106,7 +116,7 @@ function Footer() {
     <FooterLink>
       Copyright © {(new Date()).getFullYear()} {SERVER_NAME}
     </FooterLink>
-  </Box>
+  </footer>
 }
 
 export default Footer;
