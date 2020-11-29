@@ -9,7 +9,7 @@ import { getApiSrvAddr, MAX_UPLOAD_BODY_SIZE_PER_REQUEST } from "./constants";
 // see https://jimmywarting.github.io/StreamSaver.js/ for more info
 streamSaver.mitm = "/mitm.html";
 
-function wordarrayToUint8Array(wa, sigBytes) {
+export function wordarrayToUint8Array(wa, sigBytes) {
   sigBytes = sigBytes || wa.sigBytes;
   let words = wa.words;
   let bytes = new Array(words.length * 4);
@@ -87,17 +87,27 @@ function percentage(curr, tot) {
   return perc;
 }
 
-function upload({id, from, to, data, header}) {
+function upload({id, from, to, data, header, clearance}) {
   let url = `${getApiSrvAddr()}/api/v1/upload/${id}/${from}/${to}`;
+  
   if (header) {
     url += `?h=${header}`;
   }
-  return fetch(url, {
+
+  let fetchOpts = {
     credentials: 'include',
     method: "POST",
     body: data,
-  }).then(resp => resp.json())
-}
+  }
+
+  if (from === 0) {
+    fetchOpts.headers = {
+      'x-clearance': clearance,
+    }
+  }
+
+  return fetch(url, fetchOpts).then(resp => resp.json())
+};
 
 function cancelReader(reader) {
   try {
@@ -301,7 +311,7 @@ function decryptSensitiveMetadata({iv, key, encText}) {
   return decObj;
 }
 
-export function encrypt({buffer, totSize, onProgress, onError, filename, maxDownloads, lifetime}) {
+export function encrypt({buffer, totSize, onProgress, onError, filename, maxDownloads, lifetime, clearance}) {
   let key = randomKey();
   let itemId = uuidv4().toString();
   let iv = CryptoJS.lib.WordArray.random(16);
@@ -344,6 +354,7 @@ export function encrypt({buffer, totSize, onProgress, onError, filename, maxDown
 
     upload({
       id: itemId,
+      clearance: clearance,
       header: (!completed) ? null : serializeHeader({
         iv: iv,
         sensitive: encryptSensitiveMetadata({iv, key, filename, size: totSize}),

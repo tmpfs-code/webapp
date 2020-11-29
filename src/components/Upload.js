@@ -1,8 +1,9 @@
 import prettyBytes from "pretty-bytes";
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { MAX_FILE_SIZE } from '../constants';
 import { encrypt } from "../crypto";
+import { doUploadClearance } from "../upload-clearance";
 import ErrorDialog from './ErrorDialog';
 import UploadCompleted from "./UploadCompleted";
 import UploadConfirm from "./UploadConfirm";
@@ -39,11 +40,26 @@ function Upload() {
     fileInputRef.current.value = '';
   }
 
-  function confirmUpload({maxDownloads, lifetime}) {
+  async function confirmUpload({maxDownloads, lifetime}) {
     setUploadProgress({perc: 0});
+
+    let clearance = await doUploadClearance();
+  
+    if (clearance.err) {
+      cancelUpload();
+      
+      if (parseInt(clearance.err) > 0) {
+        setErrDialogProps({open: true, title: t('errors.bot_title'), message: <Trans i18nKey='errors.bot_msg' />});
+      } else {
+        console.error(clearance);
+        setErrDialogProps({open: true, title: t('errors.text2'), message:  t('errors.text3')});
+      }
+      return
+    }
 
     encrypt({
       buffer: reader.result,
+      clearance: clearance.sol,
       filename: fileInfo.name,
       maxDownloads: maxDownloads,
       lifetime: lifetime,

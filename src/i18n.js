@@ -34,6 +34,9 @@ const resources = {
         text3: "An error occurred while uploading your file. If this error persists, please contact the site administrator.",
         text4: "Server not reachable, try later.",
         
+        bot_title: "Stop there",
+        bot_msg: "It seems you are behaving like a BOT and not a proper human being. Maybe you are just trying to upload too many files too fast.<br/><br/>Retry in a minute or so.",
+
         text5: "Invalid key",
         text6: "The provided decryption key is not correct.<br/>In this URL the key is the last sequence of characters, right after the \"#\" symbol.<br/>Make sure it is correct.",
 
