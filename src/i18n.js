@@ -26,6 +26,8 @@ const resources = {
       contactTitle: "Support & Feedback",
       contactMsg: "Please contact us using this email address: ",
 
+      by_using_this: "By using this service you agree to the<br/><0>Terms of Service</0> and the <1>Privacy Policy</1>",
+
       errors: {
         text0: "Invalid file",
         text1: "You have selected an empty file",

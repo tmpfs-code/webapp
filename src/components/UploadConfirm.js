@@ -1,21 +1,29 @@
 import { Box, makeStyles, MenuItem, Select, Typography } from '@material-ui/core';
 import TelegramIcon from '@material-ui/icons/Telegram';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import RoundBtn from './RoundBtn';
 import TitleWithFile from './TitleWithFile';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   expirationPolicySelect: {
     marginLeft: "0.5em",
     marginRight: "0.5em",
     paddingRight: "0.15em",
   },
-  cancelLink: {
+  link: {
     cursor: "pointer",
+    textDecoration: "none",
+    fontWeight: "bold",
+    color: theme.palette.text.secondary,
     "&:hover": {
       textDecoration: "underline",
     },
+  },
+  legalWarn: {
+    fontSize: "0.8em",
+    color: theme.palette.text.secondary,
+    marginTop: "2em",
   },
   button: {
     "& button:hover .MuiFab-primary": {
@@ -24,7 +32,7 @@ const useStyles = makeStyles({
       // transition: "0.4s",
     }
   },
-});
+}));
 
 function UploadConfirm(props) {
   const classes = useStyles();
@@ -65,7 +73,7 @@ function UploadConfirm(props) {
         </Select>
 
         <Typography display="inline" color="textPrimary">
-        {t('upload_page.text7')}
+          {t('upload_page.text7')}
         </Typography>
 
         <Select value={lifetime} onChange={e => setLifetime(e.target.value)} className={classes.expirationPolicySelect}>
@@ -82,6 +90,16 @@ function UploadConfirm(props) {
           tooltip={t('upload_page.text5')}
           icon={<TelegramIcon />}
         />
+
+        <Typography className={classes.legalWarn}>
+          <Trans
+            i18nKey="by_using_this"
+            components={[
+              <a className={classes.link} target="_blank" href="/pages/terms" />,
+              <a className={classes.link} target="_blank" href="/pages/privacy" />,
+            ]}
+          />
+        </Typography>
       </Box>
     </Box>
   </React.Fragment>;
