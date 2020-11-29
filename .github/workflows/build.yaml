@@ -36,6 +36,6 @@ jobs:
           RELEASE_NAME: "v${{ steps.get_version.outputs.VERSION }}"
         run: |
           rm -rf artifacts
-          docker build -t webapp .
+          docker build --build-arg git_commit=v${{ steps.get_version.outputs.VERSION }} -t webapp .
           docker run -v $(pwd)/artifacts:/artifacts --entrypoint=/bin/sh webapp -c 'cp -r /build/* /artifacts/'
           hub release edit $(find artifacts/checksums.txt -type f -printf "-a %p ") -m "" "$RELEASE_NAME"
