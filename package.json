@@ -29,7 +29,7 @@
     "build": "react-scripts build",
     "buildGzip": "find ./build -type f -name '*.css' -o -name '*.js' -exec gzip -k '{}' \\;",
     "buildDelServiceWorker": "cd ./build && rm -f precache-manifest.* && rm -f static/js/runtime-main.* && rm -f asset-manifest.json && rm -f service-worker.js",
-    "buildChecksums": "cd ./build && find . -type f -exec sha256sum {} \\; > ./checksums.txt",
+    "buildChecksums": "cd ./build && find . -type f -exec sha256sum {} \\; | sort > ./checksums.txt",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
