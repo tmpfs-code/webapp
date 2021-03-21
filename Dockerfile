@@ -22,7 +22,7 @@ RUN ls package.json && \
 
 # build it
 RUN npm install && \
-    ./ext-libs-fetch.sh && \
+    sha256sum -c ./ext-libs-checksums.txt && \
     GENERATE_SOURCEMAP=false REACT_APP_API_SRV_ADDR="/" REACT_APP_GIT_COMMIT_HASH="$git_commit" npm run build && \
     npm run buildDelServiceWorker && \
     npm run buildGzip && \

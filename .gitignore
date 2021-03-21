@@ -21,8 +21,3 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# ext libs
-public/polyfill.min.js
-public/mitm.html
-public/sw.js

@@ -40,8 +40,5 @@ curl --tlsv1.2 \
   https://raw.githubusercontent.com/jimmywarting/StreamSaver.js/master/sw.js
 
 
-# Ensure sha256sum is installed.
-which sha256sum
-
-# Verify files integrity
-sha256sum -c ./ext-libs-checksums.txt
+echo
+echo "PLEASE UPDATE ext-libs-checksums.txt"
