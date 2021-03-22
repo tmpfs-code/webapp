@@ -16,8 +16,9 @@ ENV git_commit $git_commit
 # and remove the .git folder
 RUN ls package.json && \
     git clean -df && \
-    ([[ $git_commit = "HEAD" ]] && (git status) || (git reset --hard)) && \
+    git reset --hard && \
     git checkout $git_commit && \
+    git log -1 && \
     rm -rf .git
 
 # build it
