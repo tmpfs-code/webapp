@@ -1,6 +1,6 @@
 import { Box, makeStyles, Typography } from '@material-ui/core';
-import prettyBytes from "pretty-bytes";
 import React from 'react';
+import Filesize from '../shared/Filesize';
 
 const useStyles = makeStyles({
   filename: {
@@ -15,12 +15,11 @@ function FileInfo(props) {
   let truncName = (name+'').length > 80 ? (name+'').substr(0, 60).trim() + "..." : name;
 
   return <Box>
-    <Typography title={name} color="textSecondary" className={classes.filename}>
+    <Typography title={name} variant="h5" className={classes.filename}>
       {truncName}
     </Typography>
-    <Typography color="textSecondary" title={size ? `${size} bytes` : ''}>
-      <b>{size ? prettyBytes(size) : <span>&nbsp;</span>}</b>
-    </Typography>
+    
+    <Filesize bytes={size} />
   </Box>
 }
 

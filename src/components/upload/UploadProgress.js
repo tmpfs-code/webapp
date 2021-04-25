@@ -11,9 +11,9 @@ function UploadProgress(props) {
   const { perc, fileInfo } = props;
 
   return <React.Fragment>
-    <Beforeunload onBeforeunload={() => t("upload_page.text9")}>
+    <Beforeunload onBeforeunload={() => t("ask_interrupt_upload")}>
       <Box textAlign="center">
-        <TitleWithFile title={t("upload_page.text8")} fileInfo={fileInfo} />
+        <TitleWithFile title={t("encrypt_and_upload")} fileInfo={fileInfo} />
       
         <Box pt={4}>
           <Typography color="textPrimary" variant="h4"

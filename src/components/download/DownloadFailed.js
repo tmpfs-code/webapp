@@ -8,10 +8,10 @@ function DownloadFailed(props) {
   return <React.Fragment>
     <Box textAlign="center">
       <Typography variant="h4" gutterBottom={true} color="textPrimary">
-        {t("errors.text7")}
+        {t("errors.download_failed")}
       </Typography>
       <Typography color="textPrimary">
-        <Trans i18nKey="errors.text8" />
+        <Trans i18nKey="errors.download_hint" />
       </Typography>
     </Box>
   </React.Fragment>;

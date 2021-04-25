@@ -15,7 +15,7 @@ function UploadCompleted(props) {
 
   return <React.Fragment>
     <Box textAlign="center">
-      <TitleWithFile title={t('upload_page.text10')} fileInfo={fileInfo} />
+      <TitleWithFile title={t('file_ready')} fileInfo={fileInfo} />
     
       <Box mt={3}>
         <OutlinedInput

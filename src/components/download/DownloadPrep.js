@@ -7,13 +7,13 @@ function DownloadPrep(props) {
 
   return <React.Fragment>
     <Box textAlign="center">
-      <Typography variant="h4" gutterBottom={true} color="textPrimary">
-        {t('download_page.text0')}
-      </Typography>
-      <Typography color="textPrimary">
-        {t('download_page.text1')}
-      </Typography>
-      <Box mt={3}>
+      <Box mt={1} mb={4}>
+        <Typography color="textPrimary" variant="h5">
+          {t('loading_file')}
+        </Typography>
+      </Box>
+
+      <Box>
         <CircularProgress size={24}/>
       </Box>
     </Box>

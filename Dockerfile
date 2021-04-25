@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:15-alpine
 RUN apk update && \
     apk --no-cache add git gcc g++ make ca-certificates curl
 
@@ -24,7 +24,7 @@ RUN ls package.json && \
 # build it
 RUN npm install && \
     sha256sum -c ./ext-libs-checksums.txt && \
-    GENERATE_SOURCEMAP=false REACT_APP_API_SRV_ADDR="/" REACT_APP_GIT_COMMIT_HASH="$git_commit" npm run build && \
+    GENERATE_SOURCEMAP=false REACT_APP_API_SRV_ADDR="/" REACT_APP_CHAIN_ID=1 REACT_APP_GIT_COMMIT_HASH="$git_commit" npm run build && \
     npm run buildDelServiceWorker && \
     npm run buildGzip && \
     npm run buildChecksums

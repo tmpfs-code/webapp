@@ -5,10 +5,12 @@ import { MAX_FILE_SIZE } from '../constants';
 import { encrypt } from "../crypto";
 import { doUploadClearance } from "../upload-clearance";
 import ErrorDialog from './ErrorDialog';
-import UploadCompleted from "./UploadCompleted";
-import UploadConfirm from "./UploadConfirm";
-import UploadProgress from './UploadProgress';
-import UploadSelectFile from "./UploadSelectFile";
+import Layout from "./Layout";
+import KeyPoints from "./upload/KeyPoints";
+import UploadCompleted from "./upload/UploadCompleted";
+import UploadConfirm from "./upload/UploadConfirm";
+import UploadProgress from './upload/UploadProgress';
+import UploadSelectFile from "./upload/UploadSelectFile";
 
 function Upload() {
   const { t } = useTranslation();
@@ -29,7 +31,7 @@ function Upload() {
   reader.onerror = function(event) {
     console.error(event)
     cancelUpload();
-    setErrDialogProps({open: true, title: t('errors.text0'), message: (event.target.error+'')})
+    setErrDialogProps({open: true, title: t('errors.invalid_file'), message: (event.target.error+'')})
   };
 
   function cancelUpload() {
@@ -40,7 +42,7 @@ function Upload() {
     fileInputRef.current.value = '';
   }
 
-  async function confirmUpload({maxDownloads, lifetime}) {
+  async function confirmUpload({maxDownloads, lifetime, fileId}) {
     setUploadProgress({perc: 0});
 
     let clearance = await doUploadClearance();
@@ -52,12 +54,13 @@ function Upload() {
         setErrDialogProps({open: true, title: t('errors.bot_title'), message: <Trans i18nKey='errors.bot_msg' />});
       } else {
         console.error(clearance);
-        setErrDialogProps({open: true, title: t('errors.text2'), message:  t('errors.text3')});
+        setErrDialogProps({open: true, title: t('errors.upload_failed'), message:  t('errors.upload_error')});
       }
       return
     }
 
     encrypt({
+      fileId: fileId,
       buffer: reader.result,
       clearance: clearance.sol,
       filename: fileInfo.name,
@@ -70,7 +73,7 @@ function Upload() {
       onError: (obj) => {
         console.error(obj);
         cancelUpload();
-        setErrDialogProps({open: true, title: t('errors.text2'), message:  t('errors.text3')});
+        setErrDialogProps({open: true, title: t('errors.upload_failed'), message:  t('errors.upload_error')});
       }
     });
   }
@@ -85,13 +88,13 @@ function Upload() {
 
     if (file.size === 0) {
       cancelUpload();
-      setErrDialogProps({open: true, title: t('errors.text0'), message: t('errors.text1')})
+      setErrDialogProps({open: true, title: t('errors.invalid_file'), message: t('errors.empty_file')})
       return;
     }
     
     if (file.size > MAX_FILE_SIZE) {
       cancelUpload();
-      setErrDialogProps({open: true, title: t('errors.text0'), message: t('errors.text9', {size: prettyBytes(MAX_FILE_SIZE)})})
+      setErrDialogProps({open: true, title: t('errors.invalid_file'), message: t('errors.file_too_large', {size: prettyBytes(MAX_FILE_SIZE)})})
       return;
     }
 
@@ -105,43 +108,46 @@ function Upload() {
     reader.readAsArrayBuffer(file);
   };
 
-  return <React.Fragment>
-    <ErrorDialog
-      onClose={() => setErrDialogProps({open: false})}
-      {...errDialogProps}
-    />
-
-    <input ref={fileInputRef}
-      type="file"
-      onChange={onFileSelected}
-      style={{display:"none"}}
-    />
-
-    {!fileInfo &&
-      <UploadSelectFile fileInputRef={fileInputRef} />
-    }
-
-    {fileInfo && !uploadProgress && 
-      <UploadConfirm
-        fileInfo={fileInfo}
-        confirmUpload={confirmUpload}
+  return <Layout
+    top={<React.Fragment>
+      <ErrorDialog
+        onClose={() => setErrDialogProps({open: false})}
+        {...errDialogProps}
       />
-    }
 
-    {uploadProgress && !uploadProgress.completed &&
-      <UploadProgress
-        fileInfo={fileInfo}
-        perc={uploadProgress.perc}
+      <input ref={fileInputRef}
+        type="file"
+        onChange={onFileSelected}
+        style={{display:"none"}}
       />
-    }
 
-    {uploadProgress && uploadProgress.completed &&
-      <UploadCompleted
-        fileInfo={fileInfo}
-        url={uploadProgress.url}
-      />
-    }
-  </React.Fragment>
+      {!fileInfo &&
+        <UploadSelectFile fileInputRef={fileInputRef} />
+      }
+
+      {fileInfo && !uploadProgress && 
+        <UploadConfirm
+          fileInfo={fileInfo}
+          confirmUpload={confirmUpload}
+        />
+      }
+
+      {uploadProgress && !uploadProgress.completed &&
+        <UploadProgress
+          fileInfo={fileInfo}
+          perc={uploadProgress.perc}
+        />
+      }
+
+      {uploadProgress && uploadProgress.completed &&
+        <UploadCompleted
+          fileInfo={fileInfo}
+          url={uploadProgress.url}
+        />
+      }
+    </React.Fragment>}
+    middle={fileInfo ? undefined : <KeyPoints />}
+  />
 }
 
 export default Upload;

@@ -1,13 +1,14 @@
 import React from 'react';
 import { base58ToWordArray, decrypt, downloadHeader } from "../crypto";
-import DownloadCompleted from './DownloadCompleted';
-import DownloadFailed from './DownloadFailed';
-import DownloadPrep from './DownloadPrep';
-import DownloadProgress from './DownloadProgress';
-import DownloadReady from './DownloadReady';
+import DownloadCompleted from './download/DownloadCompleted';
+import DownloadFailed from './download//DownloadFailed';
+import DownloadPrep from './download/DownloadPrep';
+import DownloadProgress from './download/DownloadProgress';
+import DownloadReady from './download/DownloadReady';
 import ErrorDialog from './ErrorDialog';
-import ExpiredLink from './ExpiredLink';
-import InvalidKey from './InvalidKey';
+import ExpiredLink from './download/ExpiredLink';
+import InvalidKey from './download/InvalidKey';
+import Layout from "./Layout";
 
 function decodeKey(encodedKey) {
   let key = null;
@@ -80,7 +81,12 @@ function Download(props) {
   } else if (!header) {
     elem = <DownloadPrep />
   } else if (!downloadProgress && header) {
-    elem = <DownloadReady filename={header.filename} filesize={header.clearSize} onStartClick={startDownload} />;
+    elem = <DownloadReady
+      filename={header.filename}
+      filesize={header.clearSize}
+      timeLeft={header.timeLeft}
+      dwnLeft={header.dwnLeft}
+      onStartClick={startDownload} />;
   } else if (downloadProgress && header && downloadProgress.completed) {
     elem = <DownloadCompleted filename={header.filename} filesize={header.clearSize} />;
   } else if (downloadProgress && header && !downloadProgress.completed) {
@@ -89,13 +95,17 @@ function Download(props) {
     elem = <ExpiredLink />;
   }
 
-  return <React.Fragment>
-    <ErrorDialog
-      onClose={() => setErrDialogProps({open: false})}
-      {...errDialogProps}
-    />
-    {elem}
-  </React.Fragment>;
-}
+  return <Layout
+    top={
+      <React.Fragment>
+      <ErrorDialog
+        onClose={() => setErrDialogProps({open: false})}
+        {...errDialogProps}
+      />
+      {elem}
+    </React.Fragment>
+    }
+  />
+};
 
 export default Download;

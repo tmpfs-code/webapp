@@ -163,8 +163,7 @@ export function downloadHeader({id, key, onSuccess, onError}) {
         bytes = bytes.concat(wordArrayFromByteArray(value));
       }
       if (done) {
-        let sensitive;
-        let iv;
+        let sensitive, iv, timeLeft, dwnLeft;
 
         try {
           let text = CryptoJS.enc.Utf8.stringify(bytes);
@@ -175,8 +174,11 @@ export function downloadHeader({id, key, onSuccess, onError}) {
             return
           }
 
-          iv = CryptoJS.enc.Hex.parse(header.i);
-          sensitive = decryptSensitiveMetadata({iv, key, encText: header.x});
+          iv = CryptoJS.enc.Hex.parse(header.fm.i);
+          sensitive = decryptSensitiveMetadata({iv, key, encText: header.fm.x});
+
+          dwnLeft = parseInt(header.dl);
+          timeLeft = parseInt(header.tl);
         } catch (err) {
           console.error(err)
           onError("invalid_key");
@@ -185,6 +187,8 @@ export function downloadHeader({id, key, onSuccess, onError}) {
 
         onSuccess({
           iv: iv,
+          dwnLeft: dwnLeft,
+          timeLeft: timeLeft,
           clearSizeUint64: Uint64LE(sensitive.s, 16),
           clearSize: parseInt(Uint64LE(sensitive.s, 16).toString(10)),
           filename: sensitive.n,
@@ -202,17 +206,14 @@ export function decrypt({id, key, iv, clearSize, onProgress, filename, onError})
   });
   let writtenBytesCount = 0;
   let lastPerc = -1;
-  let writer = null;
-  let fileStream = null
-  let abortFileWriter = () => {
-    if (fileStream) fileStream.abort();
-    if (writer) writer.abort();
-  }
+  let fileStream = streamSaver.createWriteStream(filename, {size: clearSize});
+  let writer = fileStream.getWriter();
 
   download({
     url: `${getApiSrvAddr()}/api/v1/download/${id}`,
     onError: (error) => {
-      abortFileWriter();
+      writer.abort();
+      fileStream.abort();
       onError(error);
     },
     onData: ({value, done}) => {
@@ -225,12 +226,6 @@ export function decrypt({id, key, iv, clearSize, onProgress, filename, onError})
       }
       if (done) {
         chunk = chunk ? chunk.concat(aesDecryptor.finalize()) : aesDecryptor.finalize();
-      }
-      
-      // init writer once
-      if (chunk && !writer) {
-        fileStream = streamSaver.createWriteStream(filename, {size: clearSize});
-        writer = fileStream.getWriter(); 
       }
 
       // write
@@ -245,15 +240,16 @@ export function decrypt({id, key, iv, clearSize, onProgress, filename, onError})
       if (chunk) {
         let perc = percentage(writtenBytesCount, clearSize);
         if (perc !== lastPerc) {
-          onProgress({completed: done, perc: perc});
+          onProgress({completed: false, perc: perc});
           lastPerc = perc;
         };
       }
 
       // trigger download
       if (done) {
-        if (writer) writer.close();
-        onProgress({completed: done, perc: 100});
+        writer.close()
+          .then(() => onProgress({completed: true, perc: 100}))
+          .catch(err => onError(`There was an error while saving the file: ${err}`));
       }
     }
   });
@@ -311,9 +307,9 @@ function decryptSensitiveMetadata({iv, key, encText}) {
   return decObj;
 }
 
-export function encrypt({buffer, totSize, onProgress, onError, filename, maxDownloads, lifetime, clearance}) {
+export function encrypt({fileId, buffer, totSize, onProgress, onError, filename, maxDownloads, lifetime, clearance}) {
   let key = randomKey();
-  let itemId = uuidv4().toString();
+  let itemId = fileId || uuidv4().toString();
   let iv = CryptoJS.lib.WordArray.random(16);
   // see https://cryptojs.gitbook.io/docs/#ciphers
   let aesEncryptor = CryptoJS.algo.AES.createEncryptor(key, {

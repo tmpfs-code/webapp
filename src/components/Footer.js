@@ -1,35 +1,28 @@
 
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
-import { CONTACT_EMAIL, getGitHubLink, SERVER_NAME, GIT_COMMIT_HASH } from "../constants";
+import { CONTACT_EMAIL, getGitHubLink, GIT_COMMIT_HASH, SERVER_NAME } from "../constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginBottom: "1em",
-    marginTop: "2em",
-    [theme.breakpoints.down('xs')]: {
-      borderTop: `1px solid ${theme.custom.dark1}`,
-      paddingTop: "1em",
-    }
+    fontSize: "0.8rem",
   },
   footerItem: {
+    padding: "0.6rem",
     color: theme.custom.bgTextColor3,
-    padding: "0 0.8em",
     cursor: "default",
-    [theme.breakpoints.down('xs')]: {  
+    [theme.breakpoints.down('xs')]: {
       width: "100%",
-      display: "block",
-      padding: "0.3em 0",
-    },
+    }
   },
   footerItemHighlighted: {
     color: theme.palette.secondary.light,
   },
   footerLink: {
     cursor: "pointer",
+    display: "block",
     "&:hover": {
       textDecoration: "underline",
     },
@@ -48,10 +41,10 @@ function ContactDialog(props) {
     open={!!open}
     onClose={onClose}
   >
-    <DialogTitle>{t('contactTitle')}</DialogTitle>
+    <DialogTitle>{t('contact_title')}</DialogTitle>
     <DialogContent>
       <DialogContentText>
-        <span style={{userSelect: "none"}}>{t('contactMsg')}</span>
+        <span style={{userSelect: "none"}}>{t('contact_msg')}</span>
         <b>{CONTACT_EMAIL}</b>
       </DialogContentText>
     </DialogContent>
@@ -63,14 +56,13 @@ function ContactDialog(props) {
   </Dialog>
 }
 
-function FooterLink(props) {
+function FooterItem(props) {
   const classes = useStyles();
   const { highlight } = props;
 
   return <span
     onClick={props.onClick}
-    className={`${classes.footerItem} ${highlight ? classes.footerItemHighlighted : ''} ${props.onClick ? classes.footerLink : ""}`}
-  >
+    className={`${classes.footerItem} ${highlight ? classes.footerItemHighlighted : ''} ${props.onClick ? classes.footerLink : ""}`}>
     {props.children}
   </span>
 }
@@ -83,13 +75,13 @@ function prettyPrintCommitHashOrTag(str) {
     return str.substr(0, 7);
   }
   return str;
-}
+};
 
 function Footer() {
-  const history = useHistory();
   const classes = useStyles();
   const { t } = useTranslation();
   const [ contactDialogOpen, setContactDialogOpen ] = React.useState(false);
+  // const themeContext = React.useContext(ThemeContext);
 
   return <footer className={classes.root}>
     <ContactDialog
@@ -97,26 +89,40 @@ function Footer() {
       onClose={() => setContactDialogOpen(false)} 
     />
 
-    <FooterLink onClick={() => window.open(getGitHubLink(GIT_COMMIT_HASH), '_blank')} highlight>
-      {prettyPrintCommitHashOrTag(GIT_COMMIT_HASH)} (GitHub)
-    </FooterLink>
+    <Grid container justify="center">
+      <FooterItem>
+        © {(new Date()).getFullYear()} {SERVER_NAME}
+      </FooterItem>
 
-    <FooterLink onClick={() => history.push("/pages/privacy")}>
-      {t('privacy_policy')}
-    </FooterLink>
+      <FooterItem onClick={() => window.open(getGitHubLink(GIT_COMMIT_HASH), '_blank')} highlight>
+        {prettyPrintCommitHashOrTag(GIT_COMMIT_HASH)} (GitHub)
+      </FooterItem>
 
-    <FooterLink onClick={() => history.push("/pages/terms")}>
-      {t('terms')}
-    </FooterLink>
+      <FooterItem onClick={() => setContactDialogOpen(true)}>
+        {t('contact')}
+      </FooterItem>
 
-    <FooterLink onClick={() => setContactDialogOpen(true)}>
-      {t('contact')}
-    </FooterLink>
+      <FooterItem onClick={() => window.open(getGitHubLink(GIT_COMMIT_HASH, '/legal/privacy.md'), '_blank')}>
+        {t('privacy_policy')}
+      </FooterItem>
 
-    <FooterLink>
-      Copyright © {(new Date()).getFullYear()} {SERVER_NAME}
-    </FooterLink>
-  </footer>
+      <FooterItem onClick={() => window.open(getGitHubLink(GIT_COMMIT_HASH, '/legal/terms.md'), '_blank')}>
+        {t('terms')}
+      </FooterItem>
+
+      {/* <FooterItem onClick={() => window.open('https://www.flaticon.com/', '_blank', "noreferrer")}>
+        <span title="Icons made by flaticon.com">Icons</span>
+      </FooterItem> */}
+
+      <FooterItem onClick={() => window.open('/checksums.txt', '_blank')}>
+        checksums.txt
+      </FooterItem>
+      
+      {/* <FooterItem onClick={() => themeContext.toggleThemeName()}>
+        {themeContext.themeName === 'light' ? 'Dark' : 'Light'}
+      </FooterItem> */}
+    </Grid>
+  </footer>;
 }
 
 export default Footer;

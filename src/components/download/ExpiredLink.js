@@ -8,10 +8,10 @@ function ExpiredLink(props) {
   return <React.Fragment>
     <Box textAlign="center">
       <Typography variant="h4" gutterBottom={true} color="textPrimary">
-        {t('download_page.text6')}
+        {t('link_expired')}
       </Typography>
       <Typography color="textPrimary">
-        <Trans i18nKey="download_page.text7" />
+        <Trans i18nKey="link_expired_hint" />
       </Typography>
     </Box>
   </React.Fragment>;

@@ -8,10 +8,10 @@ function InvalidKey(props) {
   return <React.Fragment>
     <Box textAlign="center">
       <Typography variant="h4" gutterBottom={true} color="textPrimary">
-        {t('errors.text5')}
+        {t('errors.invalid_key')}
       </Typography>
       <Typography color="textPrimary">
-        <Trans i18nKey={"errors.text6"} />
+        <Trans i18nKey={"errors.invalid_key_hint"} />
       </Typography>
     </Box>
   </React.Fragment>;

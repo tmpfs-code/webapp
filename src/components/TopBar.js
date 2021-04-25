@@ -14,12 +14,10 @@ const useStyles = makeStyles((theme) => ({
   appTitle: {
     cursor: "pointer",
     color: theme.custom.bgTextColor1,
-    fontFamily: "'Barlow Condensed', sans-serif",
-    fontSize: "1.5em",
+    fontSize: "1.5rem",
     display: "inline-block",
-    fontWeight: "bold",
     "& em": {
-      color: theme.palette.primary.main,
+      color: theme.palette.primary.dark,
       textDecorationColor: theme.palette.primary.main,
       fontStyle: "normal !important",
     },
@@ -34,7 +32,7 @@ function TopBar() {
       <Grid item xs={11}>
         <Box align="center">
           <Typography className={classes.appTitle} onClick={() => document.location.href = "/"}>
-            /tmp<em>fs</em>
+            tmp<em>fs</em>
           </Typography>
         </Box>
       </Grid>
