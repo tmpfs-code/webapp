@@ -27,7 +27,7 @@ function DownloadReady({ filename, filesize, dwnLeft, timeLeft, onStartClick }) 
       <Box mt={3}>
         <RoundBtn
           tooltip={t('start_download')}
-          onClick={() => onStartClick()}
+          onClick={onStartClick}
           icon={<GetAppIcon />}
         />
       </Box>

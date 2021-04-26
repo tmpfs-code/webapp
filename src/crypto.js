@@ -1,13 +1,9 @@
-import CryptoJS from "crypto-js"
-import { Uint64LE } from "int64-buffer"
-import { Base64 } from "js-base64";
-import streamSaver from "streamsaver";
 import bs58 from "bs58";
+import CryptoJS from "crypto-js";
+import { Uint64LE } from "int64-buffer";
+import { Base64 } from "js-base64";
 import { v4 as uuidv4 } from 'uuid';
 import { getApiSrvAddr, MAX_UPLOAD_BODY_SIZE_PER_REQUEST } from "./constants";
-
-// see https://jimmywarting.github.io/StreamSaver.js/ for more info
-streamSaver.mitm = "/mitm.html";
 
 export function wordarrayToUint8Array(wa, sigBytes) {
   sigBytes = sigBytes || wa.sigBytes;
@@ -198,7 +194,7 @@ export function downloadHeader({id, key, onSuccess, onError}) {
   })
 }
 
-export function decrypt({id, key, iv, clearSize, onProgress, filename, onError}) {
+export function decrypt({id, key, iv, writer, clearSize, onProgress, filename, onError}) {
   let aesDecryptor = CryptoJS.algo.AES.createDecryptor(key, {
     iv: iv,
     mode: CryptoJS.mode.CBC,
@@ -206,20 +202,17 @@ export function decrypt({id, key, iv, clearSize, onProgress, filename, onError})
   });
   let writtenBytesCount = 0;
   let lastPerc = -1;
-  let fileStream = streamSaver.createWriteStream(filename, {size: clearSize});
-  let writer = fileStream.getWriter();
 
   download({
     url: `${getApiSrvAddr()}/api/v1/download/${id}`,
     onError: (error) => {
       writer.abort();
-      fileStream.abort();
       onError(error);
     },
     onData: ({value, done}) => {
       let bytes = value ? wordArrayFromByteArray(value) : null;
       let chunk = null;
-
+      
       // decrypt
       if (bytes) {
         chunk = aesDecryptor.process(bytes);

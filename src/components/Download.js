@@ -1,14 +1,18 @@
 import React from 'react';
+import streamSaver from "streamsaver";
 import { base58ToWordArray, decrypt, downloadHeader } from "../crypto";
-import DownloadCompleted from './download/DownloadCompleted';
 import DownloadFailed from './download//DownloadFailed';
+import DownloadCompleted from './download/DownloadCompleted';
 import DownloadPrep from './download/DownloadPrep';
 import DownloadProgress from './download/DownloadProgress';
 import DownloadReady from './download/DownloadReady';
-import ErrorDialog from './ErrorDialog';
 import ExpiredLink from './download/ExpiredLink';
 import InvalidKey from './download/InvalidKey';
+import ErrorDialog from './ErrorDialog';
 import Layout from "./Layout";
+
+// see https://jimmywarting.github.io/StreamSaver.js/ for more info
+streamSaver.mitm = "/mitm.html";
 
 function decodeKey(encodedKey) {
   let key = null;
@@ -32,14 +36,26 @@ function Download(props) {
   const [expired, setExpired] = React.useState(null)
   const [downloadProgress, setDownloadProgress] = React.useState(null)
   const [downloadFailed, setDownloadFailed] = React.useState(null)
+  
+  const onStartClick = (clickEvent) => {
+    // [...]Popups are often blocked but if you can't it's best that you initiate the createWriteStream on user interaction.[...]
+    // see https://www.npmjs.com/package/streamsaver
+    const writableStream = streamSaver.createWriteStream(header.filename, {size: header.clearSize});
+    const writer = writableStream.getWriter();
     
-  const startDownload = () => {
+    // abort so it dose not look stuck
+    window.onunload = () => {
+      writableStream.abort()
+      writer.abort()
+    };
+
     setDownloadProgress({perc: 0});
 
     decrypt({
       id: id,
       key: key,
       iv: header.iv,
+      writer: writer,
       clearSize: header.clearSize,
       filename: header.filename,
       onProgress: (obj) => setDownloadProgress(obj),
@@ -86,7 +102,7 @@ function Download(props) {
       filesize={header.clearSize}
       timeLeft={header.timeLeft}
       dwnLeft={header.dwnLeft}
-      onStartClick={startDownload} />;
+      onStartClick={onStartClick} />;
   } else if (downloadProgress && header && downloadProgress.completed) {
     elem = <DownloadCompleted filename={header.filename} filesize={header.clearSize} />;
   } else if (downloadProgress && header && !downloadProgress.completed) {
