@@ -34,10 +34,18 @@ export async function verifyPayment({txHash, timeout}) {
   const pollingInterval = 5000;
 
   for(let i = 0; i < timeout; i += pollingInterval) {
-    const resp = await sendVerifyPaymentRequest({txHash});
-    if (resp.valid) {
+    let resp;
+
+    try {
+      resp = await sendVerifyPaymentRequest({txHash});
+    } catch(err) {
+      console.error(`sendVerifyPaymentRequest failed: ${err}`);
+    }
+
+    if (resp instanceof Object === true && resp.valid) {
       return resp;
     }
+
     await waitMs(pollingInterval);
   }
 
