@@ -11,7 +11,7 @@ function DownloadFailed(props) {
         {t("errors.download_failed")}
       </Typography>
       <Typography color="textPrimary">
-        <Trans i18nKey="errors.download_hint" />
+        <Trans i18nKey="errors.download_failed_hint" />
       </Typography>
     </Box>
   </React.Fragment>;
