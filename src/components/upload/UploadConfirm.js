@@ -59,7 +59,7 @@ function UploadConfirm({fileInfo, confirmUpload}) {
   const [ payButtonBusy, setPayButtonBusy ] = React.useState(false);
 
   const [ uploadOpts, setUploadOpts ] = React.useState({
-    maxDownloads: Object.keys(MAX_DOWNLOADS)[10],
+    maxDownloads: Object.keys(MAX_DOWNLOADS)[1],
     lifetime: Object.keys(LIFETIMES)[2],
     filesizeRange: -1,
     currency: 'eth',
