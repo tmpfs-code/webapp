@@ -28,7 +28,7 @@ const resources = {
       payment_verify: "Verify payment",
       wait_payment_quit_warn: "You must wait for the payment to be completed and the upload to start",
       no_provider: "You need a wallet like Metamask to continue. Visit https://metamask.io/ for more info.",
-      end_to_end_text: "Share files with end-to-end encryption and a link that automatically expires. Keep what you share private and make sure your stuff doesn't stay online forever.",
+      end_to_end_text: "Share files with end-to-end encryption and a link that automatically expires.<br/>Keep what you share private and make sure your stuff doesn't stay online forever.",
       end_to_end: "End-to-end Encryption",
       no_tracking_text: "No cookies and no third-party libraries that can track you against your will, like webfonts, javascript or css files hosted somewhere else.",
       no_tracking: "No Cookies",
