@@ -8,7 +8,7 @@ export const GIT_COMMIT_HASH = (process.env.REACT_APP_GIT_COMMIT_HASH+'').trim()
 
 // This must be kept in sync with the server-side enforcement
 export const MAX_FILE_SIZE = 750000000;
-export const MAX_FILE_SIZE_FREE = 50000000;
+export const MAX_FILE_SIZE_FREE = 200000000;
 export const MAX_UPLOAD_BODY_SIZE_PER_REQUEST = 1800000;
 
 // base64 here is only to fool a little possible github crawlers
