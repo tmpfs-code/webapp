@@ -8,11 +8,16 @@ import { CONTACT_EMAIL, getGitHubLink, GIT_COMMIT_HASH, SERVER_NAME } from "../c
 const useStyles = makeStyles((theme) => ({
   root: {
     fontSize: "0.8rem",
+    paddingTop: "2em",
+    paddingBottom: "2em",
+    opacity: 0.85,
   },
   footerItem: {
-    padding: "0.6rem",
+    padding: "0.6rem 0.9rem",
     color: theme.custom.bgTextColor3,
     cursor: "default",
+    letterSpacing: "0.01em",
+    transition: "color 0.15s ease",
     [theme.breakpoints.down('xs')]: {
       width: "100%",
     }

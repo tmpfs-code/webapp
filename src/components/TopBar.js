@@ -5,17 +5,24 @@ import React from 'react';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    marginTop: "1em",
+    marginTop: "2em",
     marginBottom: "3em",
-    [theme.breakpoints.down('sm')]: {  
+    [theme.breakpoints.down('sm')]: {
+      marginTop: "1.5em",
       marginBottom: "2em",
     },
   },
   appTitle: {
     cursor: "pointer",
     color: theme.custom.bgTextColor1,
-    fontSize: "1.5rem",
+    fontSize: "1.85rem",
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
     display: "inline-block",
+    transition: "opacity 0.15s ease",
+    "&:hover": {
+      opacity: 0.8,
+    },
     "& em": {
       color: theme.palette.primary.dark,
       textDecorationColor: theme.palette.primary.main,

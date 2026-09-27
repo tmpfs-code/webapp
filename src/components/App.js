@@ -16,6 +16,21 @@ const themeOverrides = {
   typography: {
     fontSize: 16,
     fontFamily: "'Barlow', sans-serif",
+    h4: {
+      fontWeight: 700,
+      letterSpacing: "-0.02em",
+    },
+    h5: {
+      fontWeight: 600,
+      letterSpacing: "-0.01em",
+    },
+    button: {
+      fontWeight: 600,
+      letterSpacing: "-0.01em",
+    },
+  },
+  shape: {
+    borderRadius: 14,
   },
   customDark: {
     bgColor: "#0E0E21",
@@ -26,7 +41,7 @@ const themeOverrides = {
     dark1: "#353535",
   },
   customLight: {
-    bgColor: "#fff",
+    bgColor: "#fbfbfe",
     qrCodeColor: "#0E0E21",
     bgTextColor1: "#000",
     bgTextColor2: "#000",
@@ -45,7 +60,54 @@ const themeOverrides = {
       light: "#a04cff",
       dark: "#0f00be",
     },
-  }
+  },
+  overrides: {
+    MuiButton: {
+      root: {
+        textTransform: "none",
+        borderRadius: 12,
+        paddingTop: "0.65em",
+        paddingBottom: "0.65em",
+        paddingLeft: "1.5em",
+        paddingRight: "1.5em",
+        boxShadow: "none",
+        transition: "transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease",
+      },
+      contained: {
+        boxShadow: "none",
+        "&:hover": {
+          boxShadow: "0 10px 24px -10px rgba(0,0,0,0.35)",
+          transform: "translateY(-1px)",
+        },
+        "&:active": {
+          transform: "translateY(0)",
+        },
+      },
+    },
+    MuiFab: {
+      root: {
+        boxShadow: "0 16px 32px -12px rgba(42,231,168,0.55)",
+        transition: "transform 0.2s ease, box-shadow 0.2s ease",
+        "&:hover": {
+          boxShadow: "0 20px 38px -10px rgba(42,231,168,0.65)",
+          transform: "translateY(-2px) scale(1.03)",
+        },
+      },
+    },
+    MuiPaper: {
+      rounded: {
+        borderRadius: 20,
+      },
+      elevation3: {
+        boxShadow: "0 30px 70px -30px rgba(15,15,35,0.28)",
+      },
+    },
+    MuiDialog: {
+      paper: {
+        padding: "0.5em",
+      },
+    },
+  },
 };
 
 export const ThemeContext = React.createContext()
