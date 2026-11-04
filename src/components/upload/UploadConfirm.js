@@ -10,6 +10,7 @@ import ErrorDialog from '../ErrorDialog';
 import RoundBtn from '../shared/RoundBtn';
 import CurrencySelect from './CurrencySelect';
 import PayButton from './PayButton';
+import PromoCodeField from './PromoCodeField';
 import TitleWithFile from './TitleWithFile';
 
 const useStyles = makeStyles(theme => ({
@@ -56,7 +57,7 @@ function UploadConfirm({fileInfo, confirmUpload}) {
   const { t } = useTranslation();
   const [ errDialogProps, setErrDialogProps ] = React.useState({});
   const [ price, setPrice ] = React.useState(null);
-  const [ payButtonBusy, setPayButtonBusy ] = React.useState(false);
+  const [ checkoutBusy, setCheckoutBusy ] = React.useState(false);
 
   const [ uploadOpts, setUploadOpts ] = React.useState({
     maxDownloads: Object.keys(MAX_DOWNLOADS)[1],
@@ -103,7 +104,7 @@ function UploadConfirm({fileInfo, confirmUpload}) {
         </Typography>
 
         <Select value={uploadOpts.maxDownloads}
-          disabled={payButtonBusy}
+          disabled={checkoutBusy}
           onChange={e => mergeUploadOpts({maxDownloads: e.target.value})}
           className={classes.expirationPolicySelect}>
             
@@ -127,7 +128,7 @@ function UploadConfirm({fileInfo, confirmUpload}) {
         </Typography>
 
         <Select value={uploadOpts.lifetime}
-          disabled={payButtonBusy}
+          disabled={checkoutBusy}
           onChange={e => mergeUploadOpts({lifetime: e.target.value})}
           className={classes.expirationPolicySelect}>
 
@@ -151,17 +152,23 @@ function UploadConfirm({fileInfo, confirmUpload}) {
         {price && <React.Fragment>
             <Box mb={2}>
               <CurrencySelect
-                disabled={payButtonBusy}
+                disabled={checkoutBusy}
                 price={price}
                 onChange={(c) => mergeUploadOpts({currency: c})}
               />
             </Box>
-            <PayButton 
+            <PayButton
               price={price}
               uploadOpts={uploadOpts}
-              disabled={!fileInfo.ready}
+              disabled={!fileInfo.ready || checkoutBusy}
               onPaymentConfirmed={(resp) => confirmUpload({...uploadOpts, fileId: resp.id})}
-              onBusy={(value) => setPayButtonBusy(value)}
+              onBusy={(value) => setCheckoutBusy(value)}
+            />
+            <PromoCodeField
+              uploadOpts={uploadOpts}
+              disabled={!fileInfo.ready || checkoutBusy}
+              onBusy={(value) => setCheckoutBusy(value)}
+              onRedeemed={(fileId) => confirmUpload({...uploadOpts, fileId})}
             />
           </React.Fragment>
         }

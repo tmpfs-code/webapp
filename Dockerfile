@@ -13,12 +13,17 @@ ARG git_commit=HEAD
 ENV git_commit $git_commit
 
 # remove non-git files, checkout to the given commit hash (by default is HEAD)
-# and remove the .git folder
+# and remove the .git folder. if git_commit=IGNORE, skip the checkout entirely
+# and just build whatever was copied into the image.
 RUN ls package.json && \
-    git clean -df && \
-    git reset --hard && \
-    git checkout $git_commit && \
-    git log -1 && \
+    if [ "$git_commit" = "IGNORE" ]; then \
+      echo "git_commit=IGNORE, skipping git checkout and building code as-is"; \
+    else \
+      git clean -df && \
+      git reset --hard && \
+      git checkout $git_commit && \
+      git log -1; \
+    fi && \
     rm -rf .git
 
 # build it

@@ -56,6 +56,10 @@ const resources = {
       expire_details: "This link will expire in {{timeLeft}} or after {{dwnLeft}} {{download}}.",
       price_expired: "Negotiated price has expired.",
       payment_not_verified: "Unable to verify payment. Contact support by providing the transaction hash.",
+      have_promo_code: "Have a promo code?",
+      promo_code_placeholder: "Promo code",
+      redeem: "Redeem",
+      invalid_promo_code: "Invalid or already used promo code",
       errors: {
         invalid_file: "Invalid file",
         empty_file: "You have selected an empty file",
