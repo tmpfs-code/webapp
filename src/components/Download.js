@@ -14,6 +14,23 @@ import Layout from "./Layout";
 // see https://jimmywarting.github.io/StreamSaver.js/ for more info
 streamSaver.mitm = "/mitm.html";
 
+// Firefox terminates the StreamSaver service worker after its idle timeout
+// even while it is streaming a download (StreamSaver only pings it when
+// transferable streams are unsupported, which is not the case in recent
+// Firefox), silently truncating large files. Ping it ourselves.
+function keepServiceWorkerAlive() {
+  if (!navigator.serviceWorker) {
+    return () => {};
+  }
+  const ping = () => {
+    navigator.serviceWorker.getRegistration('/')
+      .then(reg => reg && reg.active && reg.active.postMessage('ping'))
+      .catch(() => {});
+  };
+  const interval = setInterval(ping, 5000);
+  return () => clearInterval(interval);
+}
+
 function decodeKey(encodedKey) {
   let key = null;
   try {
@@ -42,6 +59,7 @@ function Download(props) {
     // see https://www.npmjs.com/package/streamsaver
     const writableStream = streamSaver.createWriteStream(header.filename, {size: header.clearSize});
     const writer = writableStream.getWriter();
+    const stopKeepAlive = keepServiceWorkerAlive();
     
     // abort so it dose not look stuck
     window.onunload = () => {
@@ -58,8 +76,12 @@ function Download(props) {
       writer: writer,
       clearSize: header.clearSize,
       filename: header.filename,
-      onProgress: (obj) => setDownloadProgress(obj),
+      onProgress: (obj) => {
+        if (obj.completed) stopKeepAlive();
+        setDownloadProgress(obj);
+      },
       onError: (error) => {
+        stopKeepAlive();
         console.error(`download failed: ${error}`);
         setDownloadFailed(true);
       },

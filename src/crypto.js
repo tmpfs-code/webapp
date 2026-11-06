@@ -113,16 +113,20 @@ function cancelReader(reader) {
   }
 }
 
+// Reads the response body chunk by chunk. If onData returns a promise, the
+// next chunk is read only after it resolves (backpressure).
 function fetchReadAll({reader, onData, onError}) {
-  reader.read().then(resp => {
-    onData(resp)
-    if (!resp.done) {
-      fetchReadAll({reader, onData, onError});
-    }
-  }).catch(error => {
-    cancelReader(reader)
-    onError(error);
-  });
+  reader.read()
+    .then(resp => Promise.resolve(onData(resp)).then(() => resp.done))
+    .then(done => {
+      if (!done) {
+        fetchReadAll({reader, onData, onError});
+      }
+    })
+    .catch(error => {
+      cancelReader(reader)
+      onError(error);
+    });
 };
 
 function download({url, onData, onError}) {
@@ -206,10 +210,10 @@ export function decrypt({id, key, iv, writer, clearSize, onProgress, filename, o
   download({
     url: `${getApiSrvAddr()}/api/v1/download/${id}`,
     onError: (error) => {
-      writer.abort();
+      writer.abort().catch(() => {});
       onError(error);
     },
-    onData: ({value, done}) => {
+    onData: async ({value, done}) => {
       let bytes = value ? wordArrayFromByteArray(value) : null;
       let chunk = null;
       
@@ -221,12 +225,16 @@ export function decrypt({id, key, iv, writer, clearSize, onProgress, filename, o
         chunk = chunk ? chunk.concat(aesDecryptor.finalize()) : aesDecryptor.finalize();
       }
 
-      // write
-      if (writtenBytesCount < clearSize) {
+      // write (waiting for the stream to accept the data, so we don't buffer
+      // the whole file in memory and so write failures are not ignored)
+      if (chunk && writtenBytesCount < clearSize) {
         let chunkOverflow = (writtenBytesCount + chunk.sigBytes) > clearSize;
         let bytesToWrite = chunkOverflow ? wordarrayToUint8Array(chunk, clearSize - writtenBytesCount) : wordarrayToUint8Array(chunk);
-        writer.write(bytesToWrite);
-        writtenBytesCount += bytesToWrite.byteLength;
+        if (bytesToWrite.byteLength > 0) {
+          await writer.ready;
+          await writer.write(bytesToWrite);
+          writtenBytesCount += bytesToWrite.byteLength;
+        }
       }
       
       // calc. percentage and emit progress
@@ -240,9 +248,15 @@ export function decrypt({id, key, iv, writer, clearSize, onProgress, filename, o
 
       // trigger download
       if (done) {
-        writer.close()
-          .then(() => onProgress({completed: true, perc: 100}))
-          .catch(err => onError(`There was an error while saving the file: ${err}`));
+        if (writtenBytesCount !== clearSize) {
+          throw new Error(`incomplete download: ${writtenBytesCount}/${clearSize} bytes`);
+        }
+        try {
+          await writer.close();
+        } catch (err) {
+          throw new Error(`There was an error while saving the file: ${err}`);
+        }
+        onProgress({completed: true, perc: 100});
       }
     }
   });

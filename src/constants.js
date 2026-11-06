@@ -7,7 +7,7 @@ const API_SRV_ADDR = process.env.REACT_APP_API_SRV_ADDR;
 export const GIT_COMMIT_HASH = (process.env.REACT_APP_GIT_COMMIT_HASH+'').trim();
 
 // This must be kept in sync with the server-side enforcement
-export const MAX_FILE_SIZE = 750000000;
+export const MAX_FILE_SIZE = 2000000000;
 export const MAX_FILE_SIZE_FREE = 200000000;
 export const MAX_UPLOAD_BODY_SIZE_PER_REQUEST = 1800000;
 
